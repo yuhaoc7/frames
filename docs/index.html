@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Light Archive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;1,300&family=Noto+Serif+SC:wght@300;500&family=JetBrains+Mono:wght@300&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f1ede6;--ink:#1b1a18;--mute:#8a847a;--line:#d6cfc3;--serif:"Cormorant Garamond","Noto Serif SC",serif;--mono:"JetBrains Mono",ui-monospace,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#121110;--ink:#ece7de;--mute:#7d776d;--line:#2b2926}}
+:root[data-theme="dark"]{--paper:#121110;--ink:#ece7de;--mute:#7d776d;--line:#2b2926}
+*{box-sizing:border-box;margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-weight:300;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.mono{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+header{position:sticky;top:0;z-index:5;display:flex;justify-content:space-between;align-items:baseline;padding:22px clamp(16px,4vw,56px);background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px)}
+header .brand{font-size:22px;font-style:italic;letter-spacing:.02em}
+header nav{display:flex;gap:22px}
+header nav button{all:unset;cursor:pointer}
+main{padding:0 clamp(16px,4vw,56px) 120px}
+.fade{animation:fade .8s ease both}@keyframes fade{from{opacity:0;transform:translateY(8px)}}
+
+/* index */
+.hero{padding:12vh 0 10vh;max-width:1100px}
+.hero h1{font-size:clamp(48px,9vw,132px);line-height:.92;font-weight:300;letter-spacing:-.02em}
+.hero h1 em{font-style:italic}
+.hero p{margin-top:28px;max-width:440px;font-size:18px;color:var(--mute);line-height:1.6}
+.list{border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:64px 1fr auto;gap:24px;align-items:center;padding:26px 0;border-bottom:1px solid var(--line);position:relative}
+.row .no{font-family:var(--mono);font-size:12px;color:var(--mute)}
+.row h2{font-size:clamp(30px,5vw,64px);font-weight:300;line-height:1;transition:transform .5s cubic-bezier(.2,.7,.2,1),font-style .3s}
+.row:hover h2{transform:translateX(18px);font-style:italic}
+.row .meta{text-align:right}
+.row .peek{position:fixed;pointer-events:none;width:300px;opacity:0;transform:scale(.96);transition:opacity .3s,transform .4s;z-index:4;box-shadow:0 30px 60px -20px rgba(0,0,0,.35)}
+.row:hover .peek{opacity:1;transform:scale(1)}
+.strip{display:flex;gap:6px;margin-top:10px}
+.strip img{height:44px;width:auto;opacity:.85}
+@media (max-width:720px){.row{grid-template-columns:34px 1fr}.row .meta{grid-column:2;text-align:left}.row .peek{display:none}}
+
+/* series */
+.s-head{display:grid;grid-template-columns:1fr 1fr;gap:40px;padding:10vh 0 8vh;align-items:end}
+.s-head h1{font-size:clamp(44px,8vw,120px);font-weight:300;line-height:.95;letter-spacing:-.02em}
+.s-head p{font-size:19px;line-height:1.7;max-width:380px}
+.s-head .facts{margin-top:22px;display:grid;gap:6px}
+@media (max-width:720px){.s-head{grid-template-columns:1fr}}
+.spectrum{display:flex;height:10px;margin-top:40px;max-width:720px}.spectrum i{flex:1}
+.pal{display:flex;height:120px}.pal i{flex:1;position:relative}.pal b{position:absolute;bottom:-20px;left:0;font-size:9px;font-weight:300}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:44px}
+.stats span{display:block;font-size:clamp(26px,3vw,40px);line-height:1}.stats em{font-style:normal}
+@media (max-width:720px){.pal b{display:none}}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:clamp(12px,2.4vw,36px);align-items:start}
+.grid figure{cursor:zoom-in;position:relative}
+.grid img{width:100%;height:auto;display:block;background:var(--line);opacity:0;transition:opacity .9s}
+.grid img.ok{opacity:1}
+.grid figcaption{margin-top:8px;display:flex;justify-content:space-between}
+.pager{display:flex;justify-content:space-between;margin-top:14vh;border-top:1px solid var(--line);padding-top:26px}
+.pager a{font-size:clamp(26px,4vw,48px)}.pager a:hover{font-style:italic}
+
+/* contact sheet */
+.sheet{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;padding-top:6vh}
+.sheet img{width:100%;aspect-ratio:3/2;object-fit:cover;cursor:zoom-in;display:block}
+
+/* lightbox */
+.lb{position:fixed;inset:0;background:var(--paper);z-index:20;display:none;grid-template-rows:1fr auto}
+.lb.on{display:grid}
+.lb img{max-width:calc(100vw - 32px);max-height:calc(100vh - 90px);margin:auto;object-fit:contain;align-self:center}
+.lb .bar{display:flex;justify-content:space-between;padding:16px clamp(16px,4vw,56px);gap:16px;flex-wrap:wrap}
+.lb .zone{position:absolute;top:0;bottom:60px;width:35%;cursor:w-resize}.lb .zone.r{right:0;cursor:e-resize}
+.lb .x{position:absolute;top:18px;right:clamp(16px,4vw,56px);cursor:pointer;z-index:2}
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="#/">Light Archive</a>
+  <nav class="mono"><a href="#/">Series</a><a href="#/sheet">Contact Sheet</a><button id="theme">◐</button></nav>
+</header>
+<main id="app"></main>
+<div class="lb" id="lb">
+  <span class="x mono" id="lbx">Close ✕</span>
+  <div class="zone" id="lbp"></div><div class="zone r" id="lbn"></div>
+  <img id="lbimg" alt="">
+  <div class="bar mono"><span id="lbt"></span><span id="lbe"></span><span id="lbc"></span></div>
+</div>
+<script src="data.js"></script>
+<script>
+const S = window.SHOOTS, app = document.getElementById('app');
+const img = (id, s) => `img/${id}_${s}.jpg`;
+const pad = n => String(n).padStart(2, '0');
+const fmt = t => { const d = new Date(t); return `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())}`; };
+const hm = t => t.slice(11, 16);
+const cover = s => s.cover || s.photos[Math.floor(s.photos.length/2)].id;
+
+// rhythmic, editorial placement on a 12-col grid
+const LAYOUT = [[1,8],[9,4],[3,6],[9,4],[1,5],[6,7],[2,10],[1,4],[5,4],[9,4],[4,6],[1,7]];
+function place(p, i) {
+  const portrait = p.h > p.w; let [c, w] = LAYOUT[i % LAYOUT.length];
+  if (portrait) { w = Math.min(w, 5); if (c + w > 13) c = 13 - w; }
+  return `grid-column:${c} / span ${w};margin-top:${i % 3 === 1 ? 'clamp(0px,8vw,140px)' : '0'}`;
+}
+
+// series colour: most common dominant colours across its frames
+const palette = s => s.photos.map(p => p.palette[0]).filter((c, i, a) => a.indexOf(c) === i)
+  .slice(0, 12).sort((a, b) => lum(a) - lum(b)).filter((_, i, a) => a.length <= 6 || i % Math.ceil(a.length/6) === 0).slice(0, 6);
+const lum = h => { const n = parseInt(h.slice(1), 16); return (n >> 16) * .3 + (n >> 8 & 255) * .59 + (n & 255) * .11; };
+function stats(s) {
+  const ex = s.photos.map(p => p.exif.split(' · ')), iso = ex.map(e => +e[3].slice(4)), f = ex.map(e => e[1]);
+  const mode = a => a.sort((x, y) => a.filter(v => v === y).length - a.filter(v => v === x).length)[0];
+  const span = (new Date(s.end) - new Date(s.start)) / 60000;
+  return [[s.photos.length, 'frames'], [span < 60 ? Math.round(span) + "'" : (span/60).toFixed(1) + 'h', 'duration'],
+          [mode(f.slice()), 'aperture'], [Math.min(...iso) === Math.max(...iso) ? iso[0] : Math.min(...iso) + '–' + Math.max(...iso), 'iso']]
+    .map(([v, k]) => `<div><span>${v}</span><em class="mono">${k}</em></div>`).join('');
+}
+
+function home() {
+  const total = S.reduce((a, s) => a + s.photos.length, 0);
+  app.innerHTML = `<section class="hero fade">
+    <p class="mono">Fujifilm X-M5 · ${S.length} series · ${total} frames</p>
+    <h1 style="margin-top:20px">Things seen,<br><em>slowly.</em></h1>
+    <div class="spectrum">${S.flatMap(s=>s.photos).map(p=>`<i style="background:${p.palette[0]}"></i>`).join('')}</div></section>
+  <section class="list fade">${S.map((s, i) => `
+    <a class="row" href="#/s/${s.key}">
+      <span class="no">${pad(i+1)}</span>
+      <div><h2>${s.title}</h2><div class="strip">${s.photos.slice(0,6).map(p=>`<img loading="lazy" src="${img(p.id,'s')}" alt="">`).join('')}</div></div>
+      <div class="meta mono">${fmt(s.start)}<br>${s.photos.length} frames</div>
+      <img class="peek" src="${img(cover(s),'s')}" alt="">
+    </a>`).join('')}</section>`;
+  app.querySelectorAll('.row').forEach(r => r.addEventListener('mousemove', e => {
+    const pk = r.querySelector('.peek'); pk.style.left = e.clientX + 30 + 'px'; pk.style.top = e.clientY - 100 + 'px';
+  }));
+}
+
+function series(key) {
+  const i = S.findIndex(s => s.key === key), s = S[i]; if (!s) return home();
+  const prev = S[(i - 1 + S.length) % S.length], next = S[(i + 1) % S.length];
+  app.innerHTML = `<section class="s-head fade">
+      <div><p class="mono">Series ${pad(i+1)}</p><h1 style="margin-top:14px">${s.title}</h1></div>
+      <div><div class="pal">${palette(s).map(c=>`<i style="background:${c}"><b class="mono">${c}</b></i>`).join('')}</div>
+        <div class="stats">${stats(s)}</div><div class="facts mono">
+        <span>${fmt(s.start)} · ${hm(s.start)}–${hm(s.end)}</span><span>${s.photos.length} frames · ${s.photos[0].model}</span></div></div>
+    </section>
+    <section class="grid">${s.photos.map((p, j) => `
+      <figure style="${place(p, j)}" data-j="${j}">
+        <img loading="lazy" src="${img(p.id,'l')}" width="${p.w}" height="${p.h}" alt="" onload="this.classList.add('ok')">
+        <figcaption class="mono"><span>${pad(j+1)}</span><span>${hm(p.time)}</span></figcaption>
+      </figure>`).join('')}</section>
+    <nav class="pager"><a href="#/s/${prev.key}">← ${prev.title}</a><a href="#/s/${next.key}">${next.title} →</a></nav>`;
+  app.querySelectorAll('figure').forEach(f => f.onclick = () => openLb(s.photos, +f.dataset.j, s.title));
+}
+
+function sheet() {
+  const all = S.flatMap(s => s.photos.map(p => ({...p, series: s.title})));
+  app.innerHTML = `<section class="sheet fade">${all.map((p, j) =>
+    `<img loading="lazy" src="${img(p.id,'s')}" data-j="${j}" title="${p.id}" alt="">`).join('')}</section>`;
+  app.querySelectorAll('.sheet img').forEach(el => el.onclick = () => openLb(all, +el.dataset.j));
+}
+
+let L = { list: [], j: 0, title: '' };
+const lb = document.getElementById('lb');
+function openLb(list, j, title) { L = { list, j, title }; lb.classList.add('on'); draw(); }
+function draw() {
+  const p = L.list[L.j];
+  document.getElementById('lbimg').src = img(p.id, 'l');
+  document.getElementById('lbt').textContent = `${L.title || p.series} — ${p.id}`;
+  document.getElementById('lbe').textContent = p.exif;
+  document.getElementById('lbc').textContent = `${pad(L.j+1)} / ${pad(L.list.length)}`;
+}
+const step = d => { L.j = (L.j + d + L.list.length) % L.list.length; draw(); };
+document.getElementById('lbp').onclick = () => step(-1);
+document.getElementById('lbn').onclick = () => step(1);
+document.getElementById('lbx').onclick = () => lb.classList.remove('on');
+addEventListener('keydown', e => { if (!lb.classList.contains('on')) return;
+  if (e.key === 'ArrowRight') step(1); if (e.key === 'ArrowLeft') step(-1); if (e.key === 'Escape') lb.classList.remove('on'); });
+
+document.getElementById('theme').onclick = () => {
+  const dark = matchMedia('(prefers-color-scheme: dark)').matches, cur = document.documentElement.dataset.theme;
+  document.documentElement.dataset.theme = (cur ? cur === 'dark' : dark) ? 'light' : 'dark';
+};
+
+function route() {
+  lb.classList.remove('on'); scrollTo(0, 0);
+  const h = location.hash.slice(2);
+  if (h.startsWith('s/')) series(h.slice(2)); else if (h === 'sheet') sheet(); else home();
+}
+addEventListener('hashchange', route); route();
+</script>
+</body>
+</html>
